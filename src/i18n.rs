@@ -22,7 +22,6 @@ struct Localizations;
 /// preferred locale while explicit choices remain stable across restarts.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
 pub enum Language {
-    #[default]
     #[serde(rename = "system")]
     System,
     #[serde(rename = "en-US")]
@@ -45,6 +44,8 @@ pub enum Language {
     ZhCn,
     #[serde(rename = "es-ES")]
     EsEs,
+    // ConstruÁgil: português por omissão.
+    #[default]
     #[serde(rename = "pt-BR")]
     PtBr,
     #[serde(rename = "ar-SA")]

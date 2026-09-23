@@ -105,8 +105,11 @@ pub fn view_window(
         row![
             logo,
             column![
-                text("Open CAD Studio").size(28).style(primary_style),
-                text(t!("CAD application for Architecture & Engineering"))
+                text("ConstruÁgil CAD").size(28).style(primary_style),
+                text("Baseado no Open CAD Studio (Hakan Seven e colaboradores) · GPL-3.0")
+                    .size(11)
+                    .style(muted_style),
+                text("Código-fonte: github.com/construagil/construagil-cad")
                     .size(11)
                     .style(muted_style),
                 text(version.clone()).size(13),

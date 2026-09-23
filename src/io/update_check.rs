@@ -2,9 +2,9 @@
 
 #[cfg(not(target_arch = "wasm32"))]
 const RELEASES_API: &str =
-    "https://api.github.com/repos/HakanSeven12/OpenCADStudio/releases/latest";
+    "https://api.github.com/repos/construagil/construagil-cad/releases/latest";
 pub const RELEASES_PAGE: &str =
-    "https://github.com/HakanSeven12/OpenCADStudio/releases/latest";
+    "https://github.com/construagil/construagil-cad/releases/latest";
 
 /// Give release assets time to propagate before offering an update.
 #[cfg(not(target_arch = "wasm32"))]

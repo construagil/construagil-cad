@@ -3361,7 +3361,7 @@ fn start_page_content<'a>(
     action_width_out: std::sync::Arc<std::sync::atomic::AtomicU32>,
     active: super::StartSection,
 ) -> Element<'a, Message> {
-    let headline = text("Open CAD Studio").size(40).style(start_primary_style);
+    let headline = text("ConstruÁgil CAD").size(40).style(start_primary_style);
 
     // Plain outlined button (Open / New / Help / Contribute).
     let outline_btn = |label: String, msg: Message| {
@@ -3387,6 +3387,8 @@ fn start_page_content<'a>(
             })
     };
 
+    // ConstruÁgil: sem botão de doação na página inicial.
+    #[allow(unused_variables)]
     // Donate — the prominent call-to-action, using the theme's danger role.
     let donate_btn = {
         button(
@@ -3408,7 +3410,6 @@ fn start_page_content<'a>(
     let primary_row = WrapFlow::new(vec![
         outline_btn(crate::tr!("start", "new-drawing"), Message::TabNew).into(),
         outline_btn(crate::tr!("start", "open-file"), Message::OpenFile).into(),
-        donate_btn.into(),
     ])
     .spacing_x(12.0)
     .row_h(48.0)
@@ -3416,14 +3417,6 @@ fn start_page_content<'a>(
 
     #[cfg_attr(target_arch = "wasm32", allow(unused_mut))]
     let mut secondary_items: Vec<Element<'a, Message>> = vec![
-        outline_btn(
-            crate::tr!("start", "send-feedback"),
-            Message::RibbonToolClick {
-                tool_id: "REPORT".to_string(),
-                event: crate::modules::ModuleEvent::Command("REPORT".to_string()),
-            },
-        )
-        .into(),
         outline_btn(crate::tr!("action", "options"), Message::OptionsOpen).into(),
     ];
     secondary_items
@@ -3446,9 +3439,9 @@ fn start_page_content<'a>(
     }
     #[cfg(target_arch = "wasm32")]
     secondary_items.push(
-        button(text(crate::t!("OCS Desktop")).size(14))
+        button(text("Código-fonte (GPL-3)").size(14))
             .on_press(Message::OpenUrl(
-                "https://github.com/HakanSeven12/OpenCADStudio/releases/latest".to_string(),
+                "https://github.com/construagil/construagil-cad".to_string(),
             ))
             .padding([10, 22])
             .style(|theme: &Theme, status| start_action_shape(button::primary(theme, status)))
@@ -3459,6 +3452,7 @@ fn start_page_content<'a>(
         .row_h(44.0)
         .report_natural_width(action_width_out.clone());
 
+    #[allow(unused_variables)]
     let reddit_btn = button(
         row![
             iced::widget::svg(iced::widget::svg::Handle::from_memory(include_bytes!(
@@ -3493,6 +3487,7 @@ fn start_page_content<'a>(
         })
     });
 
+    #[allow(unused_variables)]
     let sponsors = column![
         text(crate::tr!("start", "sponsors")).size(15),
         mouse_area(
@@ -3532,10 +3527,9 @@ fn start_page_content<'a>(
         container(primary_row).center_x(Fill),
         Space::new().height(iced::Length::Fixed(10.0)),
         container(secondary_row).center_x(Fill),
-        Space::new().height(iced::Length::Fixed(10.0)),
-        container(reddit_btn).center_x(Fill),
         Space::new().height(iced::Length::Fixed(20.0)),
-        sponsors,
+        container(text("Baseado no Open CAD Studio · GPL-3.0").size(12).style(start_muted_style))
+            .center_x(Fill),
         Space::new().height(iced::Length::Fixed(52.0)),
     ]
     .spacing(0)
@@ -3560,7 +3554,9 @@ fn start_page_content<'a>(
     let welcome_wide_min = measured_action_w.max(360.0);
     let avail = (avail_w - 16.0).max(0.0); // minus the page's l/r padding
     let panel_widths = [panel_w; 4];
-    let mut panel_visible = [true, true, true, true];
+    // ConstruÁgil: só «Documentos recentes»; tutoriais, discussões e
+    // apoiantes são do projeto original.
+    let mut panel_visible = [true, false, false, false];
     let required_width = |visible: &[bool; 4]| {
         let visible_panels = visible.iter().filter(|&&shown| shown).count();
         welcome_wide_min

@@ -1,0 +1,57 @@
+# ConstruÁgil CAD — build da versão web (wasm).
+# Gera o artefacto `construagil-cad-web` (pasta pronta a publicar na Vercel).
+name: ConstruAgil CAD (web)
+
+on:
+  push:
+    branches: [construagil]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install trunk
+        uses: taiki-e/install-action@v2
+        with:
+          tool: trunk
+
+      - name: Read wasm-bindgen version
+        id: wbg
+        run: |
+          VERSION=$(sed -n '/name = "wasm-bindgen"/{n;s/version = "\(.*\)"/\1/p;q;}' Cargo.lock)
+          test -n "$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Install wasm-bindgen CLI
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-bindgen@${{ steps.wbg.outputs.version }}
+
+      - name: Build web bundle
+        run: trunk build --locked --release --public-url / --dist dist/app --html-output index.html web-app.html
+
+      - name: Vercel config (COOP/COEP para multi-thread)
+        run: |
+          cp packaging/construagil/vercel.json dist/app/vercel.json
+          echo '[]' > dist/app/supporters.json
+          jq -n --arg commit "$GITHUB_SHA" '{version: "2026.38-construagil", commit: $commit}' > dist/app/release.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: construagil-cad-web
+          path: dist/app
+          retention-days: 30

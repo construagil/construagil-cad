@@ -89,11 +89,14 @@ pub struct UiThemeConfig {
 }
 
 impl Default for UiThemeConfig {
+    /// ConstruÁgil: base Oxocarbon com o verde da marca (#0AA54E) como cor
+    /// de destaque.
     fn default() -> Self {
-        let theme = iced::Theme::Oxocarbon;
+        let mut palette = UiThemePalette::from_iced(iced::Theme::Oxocarbon.seed());
+        palette.primary = [0x0A, 0xA5, 0x4E];
         Self {
-            name: theme.to_string(),
-            palette: UiThemePalette::from_iced(theme.seed()),
+            name: "Custom".to_string(),
+            palette,
         }
     }
 }

@@ -8,7 +8,8 @@ impl OpenCADStudio {
             self.pending_startup_modals
                 .push_back(ModalKind::AssocPrompt);
         }
-        if self.donation_prompt_version != env!("OCS_APP_VERSION") {
+        // ConstruÁgil: sem pedido de doação no arranque.
+        if false && self.donation_prompt_version != env!("OCS_APP_VERSION") {
             self.pending_startup_modals
                 .push_back(ModalKind::DonationPrompt);
         }

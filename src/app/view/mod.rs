@@ -3395,52 +3395,17 @@ fn start_page_content<'a>(
     .row_h(48.0)
     .report_natural_width(action_width_out.clone());
 
-    #[cfg_attr(target_arch = "wasm32", allow(unused_mut))]
-    let mut secondary_items: Vec<Element<'a, Message>> = vec![
-        outline_btn(crate::tr!("action", "options"), Message::OptionsOpen).into(),
-    ];
-    secondary_items
-        .push(outline_btn(crate::tr!("action", "plugins"), Message::PluginManagerOpen).into());
-    // The web build is already in the browser, so only the desktop offers a
-    // link to the web version.
-    #[cfg(not(target_arch = "wasm32"))]
-    {
-        // Filled with the active theme's primary colour.
-        secondary_items.push(
-            button(text(crate::t!("OCS Web")).size(14))
-                .on_press(Message::RibbonToolClick {
-                    tool_id: "WEBVERSION".to_string(),
-                    event: crate::modules::ModuleEvent::Command("WEBVERSION".to_string()),
-                })
-                .padding([10, 22])
-                .style(|theme: &Theme, status| start_action_shape(button::primary(theme, status)))
-                .into(),
-        );
-    }
-    #[cfg(target_arch = "wasm32")]
-    secondary_items.push(
-        button(text("Código-fonte (GPL-3)").size(14))
-            .on_press(Message::OpenUrl(
-                "https://github.com/construagil/construagil-cad".to_string(),
-            ))
-            .padding([10, 22])
-            .style(|theme: &Theme, status| start_action_shape(button::primary(theme, status)))
-            .into(),
-    );
-    let secondary_row = WrapFlow::new(secondary_items)
-        .spacing_x(12.0)
-        .row_h(44.0)
-        .report_natural_width(action_width_out.clone());
-
     let content = column![
         Space::new().height(iced::Length::Fixed(28.0)),
         container(headline).center_x(Fill),
         Space::new().height(iced::Length::Fixed(22.0)),
         container(primary_row).center_x(Fill),
-        Space::new().height(iced::Length::Fixed(10.0)),
-        container(secondary_row).center_x(Fill),
         Space::new().height(iced::Length::Fixed(20.0)),
-        container(text("Baseado no Open CAD Studio · GPL-3.0").size(12).style(start_muted_style))
+        container(
+            text("Baseado no Open CAD Studio · GPL-3.0 · código: github.com/construagil/construagil-cad")
+                .size(12)
+                .style(start_muted_style),
+        )
             .center_x(Fill),
         Space::new().height(iced::Length::Fixed(52.0)),
     ]

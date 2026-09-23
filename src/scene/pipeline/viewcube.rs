@@ -21,7 +21,7 @@ mod viewcube_text_atlas;
 
 use viewcube_text_atlas::{
     build_label_atlas, empty_label_atlas, AtlasTile, ATLAS_HEIGHT, ATLAS_WIDTH,
-    CARDINAL_TILE_START, FACE_TILE_COUNT, TILE_COUNT,
+    CARDINAL_TILE_START, FACE_TILE_COUNT, LOGO_TILE, TILE_COUNT,
 };
 
 const VIEWCUBE_MSAA_SAMPLES: u32 = 4;
@@ -562,6 +562,56 @@ impl ViewCubeText {
             ])
         };
 
+        // ── ConstruÁgil: logótipo em marca d'água (como o cubo da BI) ──────
+        // Desenhado ANTES das inscrições (o passe não escreve profundidade, a
+        // ordem decide quem fica por cima): nas faces visíveis e no miolo do anel.
+        let logo = self.tiles[LOGO_TILE];
+        if logo.aspect > 0.0 {
+            let mut push_logo = |pts: [Option<[f32; 3]>; 4], color: [f32; 4]| {
+                if let [Some(tl), Some(tr), Some(br), Some(bl)] = pts {
+                    let mk = |pos: [f32; 3], uv: [f32; 2]| TextVertex { pos, uv, color };
+                    verts.push(mk(tl, logo.uv_min));
+                    verts.push(mk(tr, [logo.uv_max[0], logo.uv_min[1]]));
+                    verts.push(mk(br, logo.uv_max));
+                    verts.push(mk(tl, logo.uv_min));
+                    verts.push(mk(br, logo.uv_max));
+                    verts.push(mk(bl, [logo.uv_min[0], logo.uv_max[1]]));
+                }
+            };
+            const FACE_LOGO: f32 = 0.58; // meia-largura na face (a face vai a ±0,80)
+            for (fi, &c) in FACE_CENTERS.iter().enumerate() {
+                let face_n = Vec3::from(c);
+                let world_n = cam_rotation.transform_vector3(face_n).normalize();
+                if world_n.dot(view_dir) < 0.12 {
+                    continue;
+                }
+                let (u, v) = face_label_axes(fi);
+                let center = face_n * 1.001;
+                let corner = |lx: f32, ly: f32| project(center + u * lx + v * ly);
+                push_logo(
+                    [
+                        corner(-FACE_LOGO, FACE_LOGO),
+                        corner(FACE_LOGO, FACE_LOGO),
+                        corner(FACE_LOGO, -FACE_LOGO),
+                        corner(-FACE_LOGO, -FACE_LOGO),
+                    ],
+                    [0.039, 0.647, 0.306, 0.16],
+                );
+            }
+            const RING_LOGO: f32 = 1.36; // preenche o miolo do anel (raio interno 1,40)
+            let center = Vec3::new(0.0, 0.0, RING_Z + 0.002);
+            let corner = |lx: f32, ly: f32| project(center + Vec3::X * lx + Vec3::Y * ly);
+            push_logo(
+                [
+                    corner(-RING_LOGO, RING_LOGO),
+                    corner(RING_LOGO, RING_LOGO),
+                    corner(RING_LOGO, -RING_LOGO),
+                    corner(-RING_LOGO, -RING_LOGO),
+                ],
+                [0.039, 0.647, 0.306, 0.55],
+            );
+        }
+
         for (fi, &c) in FACE_CENTERS.iter().enumerate() {
             let face_n = Vec3::from(c);
             let world_n = cam_rotation.transform_vector3(face_n).normalize();
@@ -569,7 +619,8 @@ impl ViewCubeText {
             if dot < 0.12 {
                 continue;
             }
-            let color = [0.0, 0.0, 0.0, 1.0];
+            // ConstruÁgil: inscrição em cinza-ardósia (#334155), como na BI.
+            let color = [0.200, 0.255, 0.333, 1.0];
             let (u, v) = face_label_axes(fi);
             let center = face_n * 1.002;
             let tile = self.tiles[fi];
@@ -708,7 +759,12 @@ impl ViewCubeText {
 
 const F: f32 = 0.80;
 const E: f32 = 1.00;
-const SURFACE_RGB: [f32; 3] = [0.62, 0.76, 0.84];
+// ConstruÁgil: as cores do cubo da BI — faces claras (#F1F5F9), arestas e
+// cantos em verde da marca misturado na face (35 % e 55 %), anel cinzento.
+const SURFACE_RGB: [f32; 3] = [0.945, 0.961, 0.976];
+const EDGE_RGB: [f32; 3] = [0.628, 0.851, 0.741];
+const CORNER_RGB: [f32; 3] = [0.447, 0.788, 0.608];
+const RING_RGB: [f32; 3] = [0.580, 0.639, 0.722];
 
 fn push_quad(
     corners: [[f32; 3]; 4],
@@ -829,56 +885,56 @@ pub fn build_geometry() -> (Vec<CubeVertex>, Vec<u32>) {
     );
     push_quad(
         [[F, -F, E], [-F, -F, E], [-F, -E, F], [F, -E, F]],
-        SURFACE_RGB,
+        EDGE_RGB,
         EDGE_TOP_FRONT,
         &mut vs,
         &mut is,
     );
     push_quad(
         [[-F, F, E], [F, F, E], [F, E, F], [-F, E, F]],
-        SURFACE_RGB,
+        EDGE_RGB,
         EDGE_TOP_BACK,
         &mut vs,
         &mut is,
     );
     push_quad(
         [[F, F, E], [F, -F, E], [E, -F, F], [E, F, F]],
-        SURFACE_RGB,
+        EDGE_RGB,
         EDGE_TOP_RIGHT,
         &mut vs,
         &mut is,
     );
     push_quad(
         [[-F, -F, E], [-F, F, E], [-E, F, F], [-E, -F, F]],
-        SURFACE_RGB,
+        EDGE_RGB,
         EDGE_TOP_LEFT,
         &mut vs,
         &mut is,
     );
     push_quad(
         [[F, -F, -E], [-F, -F, -E], [-F, -E, -F], [F, -E, -F]],
-        SURFACE_RGB,
+        EDGE_RGB,
         EDGE_BOT_FRONT,
         &mut vs,
         &mut is,
     );
     push_quad(
         [[-F, F, -E], [F, F, -E], [F, E, -F], [-F, E, -F]],
-        SURFACE_RGB,
+        EDGE_RGB,
         EDGE_BOT_BACK,
         &mut vs,
         &mut is,
     );
     push_quad(
         [[F, F, -E], [F, -F, -E], [E, -F, -F], [E, F, -F]],
-        SURFACE_RGB,
+        EDGE_RGB,
         EDGE_BOT_RIGHT,
         &mut vs,
         &mut is,
     );
     push_quad(
         [[-F, -F, -E], [-F, F, -E], [-E, F, -F], [-E, -F, -F]],
-        SURFACE_RGB,
+        EDGE_RGB,
         EDGE_BOT_LEFT,
         &mut vs,
         &mut is,
@@ -887,28 +943,28 @@ pub fn build_geometry() -> (Vec<CubeVertex>, Vec<u32>) {
     // Each strip spans from one face edge to the adjacent face edge — not flat in one plane.
     push_quad(
         [[F, -E, -F], [F, -E, F], [E, -F, F], [E, -F, -F]],
-        SURFACE_RGB,
+        EDGE_RGB,
         EDGE_FRONT_RIGHT,
         &mut vs,
         &mut is,
     );
     push_quad(
         [[-F, -E, F], [-F, -E, -F], [-E, -F, -F], [-E, -F, F]],
-        SURFACE_RGB,
+        EDGE_RGB,
         EDGE_FRONT_LEFT,
         &mut vs,
         &mut is,
     );
     push_quad(
         [[F, E, F], [F, E, -F], [E, F, -F], [E, F, F]],
-        SURFACE_RGB,
+        EDGE_RGB,
         EDGE_BACK_RIGHT,
         &mut vs,
         &mut is,
     );
     push_quad(
         [[-F, E, F], [-F, E, -F], [-E, F, -F], [-E, F, F]],
-        SURFACE_RGB,
+        EDGE_RGB,
         EDGE_BACK_LEFT,
         &mut vs,
         &mut is,
@@ -927,7 +983,7 @@ pub fn build_geometry() -> (Vec<CubeVertex>, Vec<u32>) {
             [sx * F, sy * F, sz * E],
             [sx * F, sy * E, sz * F],
             [sx * E, sy * F, sz * F],
-            SURFACE_RGB,
+            CORNER_RGB,
             region,
             &mut vs,
             &mut is,
@@ -965,7 +1021,7 @@ fn build_ring(vs: &mut Vec<CubeVertex>, is: &mut Vec<u32>) {
             vs.push(CubeVertex {
                 pos,
                 normal: [0.0, 0.0, 1.0],
-                color: SURFACE_RGB,
+                color: RING_RGB,
                 region_f: -1.0,
             });
         }

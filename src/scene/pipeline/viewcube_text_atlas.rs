@@ -1,10 +1,12 @@
 use cosmic_text::{Attrs, Buffer, Color, Family, FontSystem, Metrics, Shaping, SwashCache, Weight, Wrap};
 
 pub(super) const ATLAS_WIDTH: u32 = 512;
-pub(super) const ATLAS_HEIGHT: u32 = 256;
+pub(super) const ATLAS_HEIGHT: u32 = 512;
 pub(super) const FACE_TILE_COUNT: usize = 6;
 pub(super) const CARDINAL_TILE_START: usize = FACE_TILE_COUNT;
-pub(super) const TILE_COUNT: usize = FACE_TILE_COUNT + 4;
+/// ConstruÁgil: logótipo (máscara alfa) em marca d'água nas faces e no anel.
+pub(super) const LOGO_TILE: usize = FACE_TILE_COUNT + 4;
+pub(super) const TILE_COUNT: usize = FACE_TILE_COUNT + 5;
 
 const FONT_PX: f32 = 32.0;
 const LINE_PX: f32 = 40.0;
@@ -56,8 +58,29 @@ pub(super) fn build_label_atlas(
             )
         })
         .collect();
+    let mut bitmaps = bitmaps;
+    bitmaps.push(logo_bitmap());
 
     Some(pack_bitmaps(&bitmaps))
+}
+
+/// Máscara alfa do logótipo ConstruÁgil (branco = sem tinta), gerada a partir
+/// de `imagens/marca/logo-icone.png`.
+fn logo_bitmap() -> LabelBitmap {
+    let decoded = image::load_from_memory(include_bytes!("../../../assets/construagil-logo-mask.png"))
+        .map(|img| img.to_luma8());
+    match decoded {
+        Ok(mask) => LabelBitmap {
+            width: mask.width(),
+            height: mask.height(),
+            pixels: mask.into_raw(),
+        },
+        Err(_) => LabelBitmap {
+            width: 1,
+            height: 1,
+            pixels: vec![0],
+        },
+    }
 }
 
 fn rasterize_label(

@@ -26,7 +26,7 @@ fn fs_main(in: VOut) -> @location(0) vec4<f32> {
     let is_hovered = abs(in.region_f - u.hover_region.x) < 0.001 && u.hover_region.x >= 0.0;
     var final_rgb = in.color;
     if is_hovered {
-        final_rgb = vec3<f32>(0.20, 0.72, 0.66);
+        final_rgb = vec3<f32>(0.039, 0.647, 0.306); // ConstruÁgil #0AA54E
     }
     return vec4<f32>(final_rgb, 1.0);
 }
@@ -43,5 +43,5 @@ fn line_vs_main(in: LineIn) -> @builtin(position) vec4<f32> {
 
 @fragment
 fn line_fs_main() -> @location(0) vec4<f32> {
-    return vec4<f32>(0.05, 0.08, 0.13, 1.0);
+    return vec4<f32>(0.580, 0.639, 0.722, 1.0); // ConstruÁgil #94A3B8
 }

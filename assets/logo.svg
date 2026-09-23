@@ -1,7 +1,9 @@
-<svg width="920" height="920" viewBox="0 0 1291 1291" fill="none" xmlns="http://www.w3.org/2000/svg">
-<!-- ConstruÁgil CAD — logótipo ConstruÁgil (Ā com folha), vetorizado -->
-<rect width="1291" height="1291" rx="180" fill="#0F1F18"/>
-<circle cx="645.5" cy="645.5" r="560" stroke="#0AA54E" stroke-width="72"/>
-<rect x="603" y="262" width="240" height="67" fill="#0AA54E"/>
-<path fill-rule="evenodd" fill="#0AA54E" d="M604 392H688L938 983H823L773 856H519L468 983H352Z M702 588C640 612 585 630 560 665C540 695 545 735 570 745C585 715 610 690 632 682C618 705 602 735 596 764C650 770 690 730 700 690C706 660 705 620 702 588Z"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg data-bbox="0 0 1051.76 1051.76" clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" text-rendering="geometricPrecision" shape-rendering="geometricPrecision" viewBox="0 0 1051.76 1051.76" height="100" width="100" xmlns="http://www.w3.org/2000/svg" data-type="color">
+    <g>
+        <path d="M1047.49 525.88c0 288.08-233.53 521.61-521.61 521.61S4.27 813.96 4.27 525.88 237.8 4.26 525.88 4.26s521.61 233.54 521.61 521.62" fill="#fefefe" fill-rule="nonzero" data-color="1"/>
+        <path d="M525.88 56.2C266.9 56.2 56.2 266.9 56.2 525.88s210.7 469.67 469.68 469.67 469.68-210.69 469.68-469.67S784.86 56.2 525.88 56.2M525.83 0h.1c289.95.02 525.83 235.92 525.83 525.88 0 289.97-235.91 525.88-525.88 525.88S0 815.85 0 525.88C0 235.92 235.89.02 525.83 0" fill="#606062" fill-rule="nonzero" data-color="2"/>
+        <path fill="#00a54e" fill-rule="nonzero" d="M684.03 267.5H494.61v-52.43h189.42z" data-color="3"/>
+        <path d="M470.34 525.71c14.59-10.88 32.12-17.31 49.22-24.04s38.38-13.71 51.74-26c5.67 25.39 7.31 58.22.07 85.79-3.55 13.48-9.17 26.45-17.64 37.4-9.85 12.74-23.83 22.68-40.08 26.12-12.01 2.54-25.03.38-36.5-4.75 35.04-23.15 37.43-62.5 37.43-62.5-21.5 37.19-41.77 48.81-52.44 52.52-11.72-9.58-18.73-24.31-18.38-39.01.45-18.44 11.99-34.66 26.58-45.53m88.33-201.54-.81-1.89h-63.21L289.23 799.41h90.64l42.03-104.72h208.92l41.82 104.72h89.89z" fill="#00a54e" fill-rule="nonzero" data-color="3"/>
+    </g>
 </svg>

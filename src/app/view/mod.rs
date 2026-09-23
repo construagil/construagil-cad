@@ -35,10 +35,10 @@ pub(in crate::app) use overlay::{MTEXT_TEXT_ID, TEXT_INLINE_ID};
 pub(in crate::app) const VIEWPORT_CAPTURE_BOUNDS_ID: &str = "viewport-capture-bounds";
 
 const VIEWCUBE_HIT_SIZE: f32 = VIEWCUBE_REGION_PX;
-static MOBILE_SPONSOR_IMAGE: std::sync::LazyLock<iced::widget::image::Handle> =
+static CONSTRUAGIL_MARCA: std::sync::LazyLock<iced::widget::image::Handle> =
     std::sync::LazyLock::new(|| {
         iced::widget::image::Handle::from_bytes(
-            include_bytes!("../../../assets/sponsors/cad-editor-mobile-dwg-viewer.png").as_slice(),
+            include_bytes!("../../../assets/construagil-marca.png").as_slice(),
         )
     });
 
@@ -3361,7 +3361,14 @@ fn start_page_content<'a>(
     action_width_out: std::sync::Arc<std::sync::atomic::AtomicU32>,
     active: super::StartSection,
 ) -> Element<'a, Message> {
-    let headline = text("ConstruÁgil CAD").size(40).style(start_primary_style);
+    // ConstruÁgil: marca completa (texto preto passado a branco para o tema escuro) + «CAD».
+    let headline = column![
+        iced::widget::image(CONSTRUAGIL_MARCA.clone())
+        .width(iced::Length::Fixed(420.0)),
+        text("CAD").size(28).style(start_primary_style),
+    ]
+    .spacing(8)
+    .align_x(iced::alignment::Horizontal::Center);
 
     // Plain outlined button (Open / New / Help / Contribute).
     let outline_btn = |label: String, msg: Message| {

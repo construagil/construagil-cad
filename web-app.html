@@ -54,6 +54,59 @@
       <div class="sub">Carregando…</div>
     </div>
     <script>
+      // ConstruÁgil: medidor de uso (aba CAD da Produtividade na BI). Só tempo e local —
+      // nunca o desenho. Tempo ATIVO = aba visível com rato/teclado no último minuto.
+      // Quem entra pelo card da BI traz um bilhete opaco no fragmento (#u=…), que é
+      // apagado do endereço logo aqui; sem ele o uso conta como anónimo.
+      (() => {
+        const API = "https://bi.construagil.lu/api/uso?action=cad-ingest";
+        const TICK = 15000, ENVIO = 60000, INATIVO = 60000;
+        let bilhete = "";
+        try {
+          const m = /(?:^#|&)u=([^&]+)/.exec(location.hash);
+          if (m) {
+            bilhete = decodeURIComponent(m[1]);
+            sessionStorage.setItem("cg-cad-u", bilhete);
+            history.replaceState(null, "", location.pathname + location.search);
+          } else {
+            bilhete = sessionStorage.getItem("cg-cad-u") || "";
+          }
+        } catch {}
+        const hoje = () => {
+          const d = new Date();
+          return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+        };
+        let ultimo = Date.now(), ativo = 0, aberto = 0, dia = hoje();
+        const marca = () => { ultimo = Date.now(); };
+        for (const ev of ["pointerdown", "pointermove", "keydown", "wheel", "touchstart"])
+          window.addEventListener(ev, marca, { capture: true, passive: true });
+        const corpo = () => JSON.stringify({ u: bilhete, dia, active_ms: ativo, wall_ms: aberto });
+        const enviar = (fim) => {
+          if (!ativo && !aberto) return;
+          const dados = corpo();
+          const zera = () => { ativo = 0; aberto = 0; };
+          if (fim && navigator.sendBeacon) {
+            // text/plain: pedido «simples», sem preflight de CORS
+            if (navigator.sendBeacon(API, new Blob([dados], { type: "text/plain" }))) zera();
+            return;
+          }
+          fetch(API, { method: "POST", mode: "cors", keepalive: true, headers: { "Content-Type": "text/plain" }, body: dados })
+            .then((r) => { if (r.ok) zera(); })
+            .catch(() => {});
+        };
+        setInterval(() => {
+          const d = hoje();
+          if (d !== dia) { enviar(false); dia = d; }
+          if (document.visibilityState !== "visible") return;
+          aberto += TICK;
+          if (Date.now() - ultimo < INATIVO) ativo += TICK;
+        }, TICK);
+        setInterval(() => enviar(false), ENVIO);
+        document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") enviar(true); });
+        window.addEventListener("pagehide", () => enviar(true));
+      })();
+    </script>
+    <script>
       (() => {
         const splash = document.getElementById("loading");
         fetch("locale-labels.json").then(response => response.json()).then(labels => {

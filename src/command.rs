@@ -1043,6 +1043,54 @@ impl CadCommand for SelectThenKeywordCommand {
     }
 }
 
+/// ConstruÁgil: front-end para um comando SEM opções que trabalha sobre a seleção
+/// (POLYAREA, LENGTH). Recolhe a seleção (Enter confirma) e relança `<name>` com
+/// ela — o handler inline lê o conjunto já selecionado.
+pub struct SelectThenRunCommand {
+    name: &'static str,
+    selected: Vec<Handle>,
+}
+
+impl SelectThenRunCommand {
+    pub fn new(name: &'static str) -> Self {
+        Self { name, selected: Vec::new() }
+    }
+}
+
+impl CadCommand for SelectThenRunCommand {
+    fn name(&self) -> &'static str {
+        self.name
+    }
+
+    fn prompt(&self) -> String {
+        crate::t!(
+            "%{name}  select objects, then press Enter:",
+            name = self.name
+        )
+        .into_owned()
+    }
+
+    fn is_selection_gathering(&self) -> bool {
+        true
+    }
+
+    fn on_selection_complete(&mut self, handles: Vec<Handle>) -> CmdResult {
+        self.selected = handles;
+        CmdResult::NeedPoint
+    }
+
+    fn on_enter(&mut self) -> CmdResult {
+        if self.selected.is_empty() {
+            return CmdResult::Cancel;
+        }
+        CmdResult::Relaunch(self.name.to_string(), std::mem::take(&mut self.selected))
+    }
+
+    fn on_point(&mut self, _pt: DVec3) -> CmdResult {
+        CmdResult::NeedPoint
+    }
+}
+
 /// Generic interactive front-end for a single-value command that operates on
 /// the current selection (HYPERLINK url, ARCTEXT text, TEXTFIT width, TCASE
 /// aside…). Gathers a selection first when none is set (Enter confirms), then

@@ -711,6 +711,9 @@ inventory::submit!(crate::command::CommandRegistration {
         "LTSCALE",
         "LWDISPLAY",
         "MASSPROP",
+        // ConstruÁgil: rotinas LISP da equipa refeitas como comandos nativos.
+        "POLYAREA",
+        "LENGTH",
         "MLEADERSTYLE",
         "MLSTYLE",
         "MS",

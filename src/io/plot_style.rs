@@ -22,9 +22,12 @@ pub const FILL_PATTERNS_PLOT_STYLE: &str = "Fill Patterns.ctb";
 pub const SCREENING_100_PLOT_STYLE: &str = "Screening 100%.ctb";
 pub const SCREENING_75_PLOT_STYLE: &str = "Screening 75%.ctb";
 pub const SCREENING_50_PLOT_STYLE: &str = "Screening 50%.ctb";
+/// ConstruÁgil: tabela de penas das pranchas de drywall, embutida no programa.
+pub const DRYWALL_PLOT_STYLE: &str = "CBT DRYWALL.ctb";
 pub const SCREENING_25_PLOT_STYLE: &str = "Screening 25%.ctb";
 
 const STANDARD_PLOT_STYLES: &[&str] = &[
+    DRYWALL_PLOT_STYLE,
     GRAYSCALE_PLOT_STYLE,
     FILL_PATTERNS_PLOT_STYLE,
     SCREENING_100_PLOT_STYLE,
@@ -254,6 +257,10 @@ impl PlotStyleTable {
             "screening 75%.ctb" => Ok(Self::screening(SCREENING_75_PLOT_STYLE, 75)),
             "screening 50%.ctb" => Ok(Self::screening(SCREENING_50_PLOT_STYLE, 50)),
             "screening 25%.ctb" => Ok(Self::screening(SCREENING_25_PLOT_STYLE, 25)),
+            "cbt drywall.ctb" => Self::from_bytes(
+                DRYWALL_PLOT_STYLE,
+                include_bytes!("../../assets/plotstyles/cbt-drywall.ctb"),
+            ),
             _ => Err(format!("Unknown built-in plot style: {name}")),
         }
     }

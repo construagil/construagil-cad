@@ -1104,6 +1104,56 @@ impl OpenCADStudio {
                 self.tabs[i].active_cmd = Some(Box::new(cmd));
             }
 
+            // ── ConstruÁgil: POLYAREA (antigo polyarea.lsp) e LENGTH ─────────
+            // POLYAREA soma a área das polilinhas selecionadas (abertas contam
+            // fechadas, como o AREA > Objeto do AutoCAD que o LISP usava);
+            // LENGTH soma o comprimento de linhas, arcos, círculos, elipses e
+            // polilinhas. Sem seleção, pedem-na primeiro (Enter confirma).
+            "POLYAREA" | "LENGTH" => {
+                let selected = self.tabs[i].scene.selected_entities();
+                if selected.is_empty() {
+                    use crate::command::SelectThenRunCommand;
+                    let name: &'static str = if cmd == "POLYAREA" { "POLYAREA" } else { "LENGTH" };
+                    let c = SelectThenRunCommand::new(name);
+                    self.command_line.push_info(&c.prompt());
+                    self.tabs[i].active_cmd = Some(Box::new(c));
+                } else {
+                    use crate::entities::traits::EntityTypeOps;
+                    let mut total = 0.0f64;
+                    let mut usados = 0usize;
+                    let mut ignorados = 0usize;
+                    for (handle, _) in &selected {
+                        let Some(entity) = self.tabs[i].scene.document.get_entity(*handle) else {
+                            continue;
+                        };
+                        let conta = if cmd == "POLYAREA" {
+                            matches!(entity, acadrust::EntityType::LwPolyline(_))
+                        } else {
+                            true
+                        };
+                        match (conta, entity.mass_props()) {
+                            (true, Some(props)) => {
+                                total += if cmd == "POLYAREA" { props.area } else { props.perimeter };
+                                usados += 1;
+                            }
+                            _ => ignorados += 1,
+                        }
+                    }
+                    let resumo = if cmd == "POLYAREA" {
+                        format!("POLYAREA  Área total de {usados} polilinha(s): {total:.3} unidades²")
+                    } else {
+                        format!("LENGTH  Comprimento total de {usados} objeto(s): {total:.3} unidades")
+                    };
+                    self.command_line.push_output(&resumo);
+                    if ignorados > 0 {
+                        self.command_line.push_info(&format!(
+                            "{ignorados} objeto(s) ignorado(s) (tipo sem {}).",
+                            if cmd == "POLYAREA" { "área de polilinha" } else { "comprimento" }
+                        ));
+                    }
+                }
+            }
+
             // ── MASSPROP — area, perimeter, centroid of selected entities ────
             "MASSPROP" => {
                 let selected = self.tabs[i].scene.selected_entities();

@@ -3387,26 +3387,6 @@ fn start_page_content<'a>(
             })
     };
 
-    // ConstruÁgil: sem botão de doação na página inicial.
-    #[allow(unused_variables)]
-    // Donate — the prominent call-to-action, using the theme's danger role.
-    let donate_btn = {
-        button(
-            row![
-                crate::ui::icons::themed_danger_text(crate::ui::icons::HEART, 14.0),
-                text(crate::tr!("start", "donate")).size(14),
-            ]
-            .spacing(5)
-            .align_y(iced::Center),
-        )
-        .on_press(Message::RibbonToolClick {
-            tool_id: "DONATE".to_string(),
-            event: crate::modules::ModuleEvent::Command("DONATE".to_string()),
-        })
-        .padding([10, 22])
-        .style(|theme: &Theme, status| start_action_shape(button::danger(theme, status)))
-    };
-
     let primary_row = WrapFlow::new(vec![
         outline_btn(crate::tr!("start", "new-drawing"), Message::TabNew).into(),
         outline_btn(crate::tr!("start", "open-file"), Message::OpenFile).into(),
@@ -3451,74 +3431,6 @@ fn start_page_content<'a>(
         .spacing_x(12.0)
         .row_h(44.0)
         .report_natural_width(action_width_out.clone());
-
-    #[allow(unused_variables)]
-    let reddit_btn = button(
-        row![
-            iced::widget::svg(iced::widget::svg::Handle::from_memory(include_bytes!(
-                "../../../assets/icons/reddit.svg"
-            )))
-            .width(20)
-            .height(20),
-            text("r/OpenCADStudio").size(14),
-        ]
-        .spacing(7)
-        .align_y(iced::Center),
-    )
-    .on_press(Message::OpenUrl(
-        "https://www.reddit.com/r/OpenCADStudio/".to_string(),
-    ))
-    .padding([10, 22])
-    .style(|theme: &Theme, status| {
-        let palette = theme.palette();
-        let pair = match status {
-            button::Status::Hovered => palette.background.strong,
-            _ => palette.background.weak,
-        };
-        start_action_shape(button::Style {
-            background: Some(Background::Color(pair.color)),
-            text_color: pair.text,
-            border: Border {
-                color: Color::from_rgb8(255, 69, 0),
-                width: 1.0,
-                ..Default::default()
-            },
-            ..Default::default()
-        })
-    });
-
-    #[allow(unused_variables)]
-    let sponsors = column![
-        text(crate::tr!("start", "sponsors")).size(15),
-        mouse_area(
-            container(
-                iced::widget::svg(iced::widget::svg::Handle::from_memory(include_bytes!(
-                    "../../../assets/sponsors/openaec-logo-dark-on-light.svg"
-                )))
-                .width(Fill)
-                .height(iced::Length::Fixed(120.0))
-                .content_fit(iced::ContentFit::Contain),
-            )
-            .width(Fill.max(300.0)),
-        )
-        .interaction(iced::mouse::Interaction::Pointer)
-        .on_press(Message::OpenUrl("https://open-aec.com/".to_string())),
-        mouse_area(
-            container(
-                iced::widget::image(MOBILE_SPONSOR_IMAGE.clone())
-                    .width(Fill)
-                    .content_fit(iced::ContentFit::Contain),
-            )
-            .width(Fill),
-        )
-        .interaction(iced::mouse::Interaction::Pointer)
-        .on_press(Message::OpenUrl(
-            "https://play.google.com/store/apps/details?id=net.cadeditor.app".to_string(),
-        )),
-    ]
-    .spacing(10)
-    .align_x(iced::alignment::Horizontal::Center)
-    .width(Fill);
 
     let content = column![
         Space::new().height(iced::Length::Fixed(28.0)),

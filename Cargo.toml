@@ -78,8 +78,26 @@ objc2-app-kit = { version = "0.2", features = ["NSApplication", "NSResponder", "
 objc2-foundation = { version = "0.2", features = ["NSArray", "NSURL", "NSString", "NSObject", "NSNotification", "NSThread", "NSEnumerator"] }
 
 [patch.crates-io]
-iced_core = { git = "https://github.com/iced-rs/iced.git", rev = "23604ff22ab0aad9e00b9327cb7b8546ed84db39" }
-iced_widget = { git = "https://github.com/iced-rs/iced.git", rev = "23604ff22ab0aad9e00b9327cb7b8546ed84db39" }
+iced_core = { git = "https://github.com/construagil/iced.git", rev = "0687b8e97139370bf9c5f06c47136e8c9498ced3" }
+iced_widget = { git = "https://github.com/construagil/iced.git", rev = "0687b8e97139370bf9c5f06c47136e8c9498ced3" }
+
+# ConstruÁgil: iced com os gradientes corrigidos para GPUs ARM Mali em WebGL
+# (github.com/construagil/iced, ramo construagil-mali = revisão 23604ff + 1 commit).
+[patch."https://github.com/iced-rs/iced.git"]
+iced = { git = "https://github.com/construagil/iced.git", rev = "0687b8e97139370bf9c5f06c47136e8c9498ced3" }
+iced_core = { git = "https://github.com/construagil/iced.git", rev = "0687b8e97139370bf9c5f06c47136e8c9498ced3" }
+iced_debug = { git = "https://github.com/construagil/iced.git", rev = "0687b8e97139370bf9c5f06c47136e8c9498ced3" }
+iced_futures = { git = "https://github.com/construagil/iced.git", rev = "0687b8e97139370bf9c5f06c47136e8c9498ced3" }
+iced_graphics = { git = "https://github.com/construagil/iced.git", rev = "0687b8e97139370bf9c5f06c47136e8c9498ced3" }
+iced_program = { git = "https://github.com/construagil/iced.git", rev = "0687b8e97139370bf9c5f06c47136e8c9498ced3" }
+iced_renderer = { git = "https://github.com/construagil/iced.git", rev = "0687b8e97139370bf9c5f06c47136e8c9498ced3" }
+iced_runtime = { git = "https://github.com/construagil/iced.git", rev = "0687b8e97139370bf9c5f06c47136e8c9498ced3" }
+iced_selector = { git = "https://github.com/construagil/iced.git", rev = "0687b8e97139370bf9c5f06c47136e8c9498ced3" }
+iced_test = { git = "https://github.com/construagil/iced.git", rev = "0687b8e97139370bf9c5f06c47136e8c9498ced3" }
+iced_tiny_skia = { git = "https://github.com/construagil/iced.git", rev = "0687b8e97139370bf9c5f06c47136e8c9498ced3" }
+iced_wgpu = { git = "https://github.com/construagil/iced.git", rev = "0687b8e97139370bf9c5f06c47136e8c9498ced3" }
+iced_widget = { git = "https://github.com/construagil/iced.git", rev = "0687b8e97139370bf9c5f06c47136e8c9498ced3" }
+iced_winit = { git = "https://github.com/construagil/iced.git", rev = "0687b8e97139370bf9c5f06c47136e8c9498ced3" }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 getrandom = "0.3"

@@ -42,7 +42,7 @@ jobs:
           tool: wasm-bindgen@${{ steps.wbg.outputs.version }}
 
       - name: Build web bundle
-        run: trunk build --locked --release --public-url / --dist dist/app --html-output index.html web-app.html
+        run: trunk build --release --public-url / --dist dist/app --html-output index.html web-app.html
 
       - name: Vercel config (COOP/COEP para multi-thread)
         run: |

@@ -31,8 +31,8 @@ jobs:
 
       - name: Build
         run: |
-          cargo build --locked --release
-          cargo build --locked --release -p dwg-thumbnailer-win
+          cargo build --release
+          cargo build --release -p dwg-thumbnailer-win
 
       - name: WiX 3
         shell: pwsh

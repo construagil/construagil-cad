@@ -1,0 +1,72 @@
+# ConstruÁgil CAD — programa para Windows: .exe portátil + instalador .msi (sem assinatura).
+# Gera o artefacto `construagil-cad-windows`.
+name: ConstruAgil CAD (Windows)
+
+on:
+  push:
+    branches: [construagil]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Ícones (logo + DWG/DXF)
+        shell: pwsh
+        run: |
+          magick assets/logo.svg -background none -define icon:auto-resize=16,24,32,48,64,128,256 packaging/windows/AppIcon.ico
+          magick assets/mimetypes/image-vnd.dwg.svg -define icon:auto-resize=16,24,32,48,64,128,256 packaging/windows/dwg.ico
+          magick assets/mimetypes/image-vnd.dxf.svg -define icon:auto-resize=16,24,32,48,64,128,256 packaging/windows/dxf.ico
+
+      - name: Build
+        run: |
+          cargo build --locked --release
+          cargo build --locked --release -p dwg-thumbnailer-win
+
+      - name: WiX 3
+        shell: pwsh
+        run: |
+          if (-not $env:WIX -or -not (Test-Path (Join-Path $env:WIX "bin\candle.exe"))) {
+            choco install wixtoolset --version 3.14.1 -y --no-progress
+            $wix = Get-ChildItem "C:\Program Files (x86)" -Directory -Filter "WiX Toolset v3*" | Select-Object -First 1 -ExpandProperty FullName
+            "WIX=$wix\" >> $env:GITHUB_ENV
+          }
+
+      - name: Instalador MSI
+        shell: pwsh
+        run: |
+          # MSI: maior ≤ 255 → 26.38.<corrida> (sobe a cada build, atualiza por cima)
+          $version = "26.38.${{ github.run_number }}"
+          $candle = Join-Path $env:WIX "bin\candle.exe"
+          $light  = Join-Path $env:WIX "bin\light.exe"
+          $exePath  = (Resolve-Path target\release\OpenCADStudio.exe).Path
+          $iconPath = (Resolve-Path packaging\windows\AppIcon.ico).Path
+          $licensePath = (Resolve-Path packaging\windows\License.rtf).Path
+          $mainWxs = (Resolve-Path packaging\windows\main.wxs).Path
+          $uiWxs   = (Resolve-Path packaging\windows\ui.wxs).Path
+          $objDir  = Join-Path $PWD "packaging\windows\"
+          & $candle -arch x64 "-dVersion=$version" "-dSource=$exePath" "-dIcon=$iconPath" "-dLicense=$licensePath" $mainWxs $uiWxs -out $objDir
+          if ($LASTEXITCODE -ne 0) { throw "candle failed" }
+          & $light (Join-Path $objDir "main.wixobj") (Join-Path $objDir "ui.wixobj") -ext WixUIExtension -cultures:en-us -loc packaging/windows/strings.en-US.wxl -out (Join-Path $PWD "ConstruAgil-CAD.msi")
+          if ($LASTEXITCODE -ne 0) { throw "light failed" }
+          New-Item -ItemType Directory -Force saida | Out-Null
+          Copy-Item ConstruAgil-CAD.msi saida\
+          Copy-Item target\release\OpenCADStudio.exe saida\ConstruAgil-CAD-portatil.exe
+          Get-ChildItem saida | Format-Table Name, Length
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: construagil-cad-windows
+          path: saida
+          retention-days: 30

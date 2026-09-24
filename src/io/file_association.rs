@@ -186,7 +186,7 @@ mod windows_impl {
     }
 
     // Must match the RegisteredApplications value name in packaging/windows/main.wxs.
-    const APP_REGISTRY_NAME: &str = "Open CAD Studio";
+    const APP_REGISTRY_NAME: &str = "ConstruÁgil CAD";
 
     pub(super) fn set_default() -> Result<String, String> {
         unsafe {
@@ -374,7 +374,7 @@ mod windows_impl {
             None,
             &format!("\"{exe}\" \"%1\""),
         )?;
-        set_string(APP_BASE, Some("FriendlyAppName"), "Open CAD Studio")?;
+        set_string(APP_BASE, Some("FriendlyAppName"), "ConstruÁgil CAD")?;
         // DefaultIcon is what Windows uses to show the app icon in the
         // "Open with" context-menu list and the "Choose another app" picker.
         set_string(&format!(r"{APP_BASE}\DefaultIcon"), None, &format!("\"{exe}\",0"))?;
@@ -414,7 +414,7 @@ mod windows_impl {
         // RegisteredApplications must equal the name passed to
         // LaunchAdvancedAssociationUI ("Open CAD Studio").
         const CAP: &str = r"Software\Open CAD Studio\Capabilities";
-        set_string(CAP, Some("ApplicationName"), "Open CAD Studio")?;
+        set_string(CAP, Some("ApplicationName"), "ConstruÁgil CAD")?;
         set_string(
             CAP,
             Some("ApplicationDescription"),
@@ -425,7 +425,7 @@ mod windows_impl {
         set_string(&format!(r"{CAP}\FileAssociations"), Some(".bak"), "OpenCADStudio.BAK")?;
         set_string(
             r"Software\RegisteredApplications",
-            Some("Open CAD Studio"),
+            Some("ConstruÁgil CAD"),
             r"Software\Open CAD Studio\Capabilities",
         )?;
         Ok(())

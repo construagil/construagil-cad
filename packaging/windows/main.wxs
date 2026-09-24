@@ -2,9 +2,9 @@
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
   <Product
     Id='*'
-    Name='Open CAD Studio'
-    UpgradeCode='bd6bceab-6c7a-4ce2-a62d-6ef06a92f8b1'
-    Manufacturer='Hakan Seven'
+    Name='ConstruÁgil CAD'
+    UpgradeCode='ee45934c-95c4-4958-84d9-d851d746cd36'
+    Manufacturer='ConstruÁgil'
     Language='1033'
     Codepage='1252'
     Version='$(var.Version)'>
@@ -13,7 +13,7 @@
       Id='*'
       Keywords='!(loc.Installer)'
       Description='!(loc.InstallerDescription)'
-      Manufacturer='Hakan Seven'
+      Manufacturer='ConstruÁgil'
       InstallerVersion='450'
       Languages='1033'
       Compressed='yes'
@@ -28,18 +28,18 @@
 
     <Icon Id='AppIcon.ico' SourceFile='$(var.Icon)' />
     <Property Id='ARPPRODUCTICON' Value='AppIcon.ico' />
-    <Property Id='ARPHELPLINK' Value='https://github.com/HakanSeven12/OpenCADStudio' />
-    <Property Id='ARPURLINFOABOUT' Value='https://github.com/HakanSeven12/OpenCADStudio' />
-    <Property Id='ARPURLUPDATEINFO' Value='https://github.com/HakanSeven12/OpenCADStudio/releases' />
-    <Property Id='ARPCONTACT' Value='Hakan Seven' />
+    <Property Id='ARPHELPLINK' Value='https://github.com/construagil/construagil-cad' />
+    <Property Id='ARPURLINFOABOUT' Value='https://github.com/construagil/construagil-cad' />
+    <Property Id='ARPURLUPDATEINFO' Value='https://github.com/construagil/construagil-cad/releases' />
+    <Property Id='ARPCONTACT' Value='ConstruÁgil' />
     <Property Id='ARPCOMMENTS' Value='!(loc.ApplicationDescription)' />
     <Property Id='ARPNOREPAIR' Value='1' />
 
     <Directory Id='TARGETDIR' Name='SourceDir'>
       <Directory Id='ProgramFiles64Folder'>
-        <Directory Id='APPLICATIONROOTDIRECTORY' Name='Open CAD Studio'>
+        <Directory Id='APPLICATIONROOTDIRECTORY' Name='ConstruÁgil CAD'>
 
-          <Component Id='MainExecutable' Guid='2900c116-e9a5-4650-8a4c-48c0987d1a33' Win64='yes'>
+          <Component Id='MainExecutable' Guid='3a8a78a3-6983-4ff5-a760-7cc0c5f38e3e' Win64='yes'>
             <File
               Id='OpenCADStudioEXE'
               Name='OpenCADStudio.exe'
@@ -49,7 +49,7 @@
               <Shortcut
                 Id='StartMenuShortcut'
                 Directory='ProgramMenuDir'
-                Name='Open CAD Studio'
+                Name='ConstruÁgil CAD'
                 Description='!(loc.Launch)'
                 WorkingDirectory='APPLICATIONROOTDIRECTORY'
                 Icon='AppIcon.ico'
@@ -83,7 +83,7 @@
               </Extension>
             </ProgId>
           </Component>
-          <Component Id='DefaultPrograms' Guid='6f3e9b2a-1c4d-4f8a-9b7e-2d5a8c1f0e63' Win64='yes'>
+          <Component Id='DefaultPrograms' Guid='ca5d239f-e2d7-4443-9fed-247880d9a6f5' Win64='yes'>
             <RegistryValue
               Root='HKLM'
               Key='SOFTWARE\Classes\Applications\OpenCADStudio.exe\DefaultIcon'
@@ -95,7 +95,7 @@
               Key='SOFTWARE\Classes\Applications\OpenCADStudio.exe'
               Name='FriendlyAppName'
               Type='string'
-              Value='Open CAD Studio' />
+              Value='ConstruÁgil CAD' />
             <RegistryValue
               Root='HKLM'
               Key='SOFTWARE\Classes\Applications\OpenCADStudio.exe\shell\open\command'
@@ -118,7 +118,7 @@
               Key='Software\Open CAD Studio\Capabilities'
               Name='ApplicationName'
               Type='string'
-              Value='Open CAD Studio' />
+              Value='ConstruÁgil CAD' />
             <RegistryValue
               Root='HKLM'
               Key='Software\Open CAD Studio\Capabilities'
@@ -140,7 +140,7 @@
             <RegistryValue
               Root='HKLM'
               Key='Software\RegisteredApplications'
-              Name='Open CAD Studio'
+              Name='ConstruÁgil CAD'
               Type='string'
               Value='Software\Open CAD Studio\Capabilities' />
           </Component>
@@ -149,8 +149,8 @@
       </Directory>
 
       <Directory Id='ProgramMenuFolder'>
-        <Directory Id='ProgramMenuDir' Name='Open CAD Studio'>
-          <Component Id='ProgramMenuDirComp' Guid='34a788ba-f9d4-4e73-b1ff-9eb8749b369e'>
+        <Directory Id='ProgramMenuDir' Name='ConstruÁgil CAD'>
+          <Component Id='ProgramMenuDirComp' Guid='db3e8479-7b96-4259-828a-175b8301c5de'>
             <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
             <RegistryValue
               Root='HKCU'
@@ -163,10 +163,10 @@
         </Directory>
       </Directory>
       <Directory Id='DesktopFolder' Name='!(loc.Desktop)'>
-        <Component Id='DesktopShortcutComp' Guid='c5c7f1c4-3d8a-4efd-b049-4662d9143dcd'>
+        <Component Id='DesktopShortcutComp' Guid='07e7364a-9aba-4360-889c-0f4b040a3919'>
           <Shortcut
             Id='DesktopShortcut'
-            Name='Open CAD Studio'
+            Name='ConstruÁgil CAD'
             Description='!(loc.Launch)'
             Target='[APPLICATIONROOTDIRECTORY]OpenCADStudio.exe'
             WorkingDirectory='APPLICATIONROOTDIRECTORY'
@@ -183,7 +183,7 @@
       </Directory>
     </Directory>
 
-    <Feature Id='Complete' Title='Open CAD Studio' Level='1' Display='expand'>
+    <Feature Id='Complete' Title='ConstruÁgil CAD' Level='1' Display='expand'>
       <ComponentRef Id='MainExecutable' />
       <ComponentRef Id='DefaultPrograms' />
       <ComponentRef Id='ProgramMenuDirComp' />

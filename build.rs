@@ -121,6 +121,11 @@ fn main() {
             res.set_icon("packaging/windows/AppIcon.ico");
             res.set("ProductVersion", &full_version);
             res.set("FileVersion", &app_version);
+            // ConstruÁgil: nome que o Windows mostra (Propriedades, Gestor de Tarefas, SmartScreen).
+            res.set("ProductName", "ConstruÁgil CAD");
+            res.set("FileDescription", "ConstruÁgil CAD");
+            res.set("CompanyName", "ConstruÁgil");
+            res.set("LegalCopyright", "GPL-3.0 — baseado no Open CAD Studio");
             if let Err(e) = res.compile() {
                 println!("cargo:warning=failed to embed Windows icon: {e}");
             }

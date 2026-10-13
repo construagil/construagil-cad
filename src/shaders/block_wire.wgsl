@@ -61,6 +61,15 @@ struct VertexOut {
     @location(9) @interpolate(flat) cap_ends: vec3<f32>,
 }
 
+// ConstruÁgil: sem listas locais `array<f32, 8>`. O compilador GLSL ES das GPUs ARM Mali
+// (WebGL) recusa-as no estágio de fragmento: «S0032: no default precision defined for
+// variable 'float[8]'». Os 8 valores ficam em dois vec4 e são lidos por índice, sem array.
+fn elem8(p0: vec4<f32>, p1: vec4<f32>, i: u32) -> f32 {
+    let v = select(p0, p1, i >= 4u);
+    let j = i & 3u;
+    return select(select(v.x, v.y, j == 1u), select(v.z, v.w, j == 3u), j >= 2u);
+}
+
 fn resolve_hw(taper_ratio: f32, world_hw: f32, px_hw: f32) -> f32 {
     if taper_ratio > 0.0 {
         return max((taper_ratio * world_hw) / u.world_per_pixel, 0.5);
@@ -202,18 +211,8 @@ fn vs_main(@builtin(vertex_index) vertex_index: u32, in: VertexIn) -> VertexOut 
 
     let scale = u.linetype_scale;
     var min_element = wire_const.pattern_length * scale;
-    let elements = array<f32, 8>(
-        wire_const.pat0.x * scale,
-        wire_const.pat0.y * scale,
-        wire_const.pat0.z * scale,
-        wire_const.pat0.w * scale,
-        wire_const.pat1.x * scale,
-        wire_const.pat1.y * scale,
-        wire_const.pat1.z * scale,
-        wire_const.pat1.w * scale,
-    );
     for (var i = 0u; i < 8u; i++) {
-        let value = abs(elements[i]);
+        let value = abs(elem8(wire_const.pat0, wire_const.pat1, i) * scale);
         if value > 0.0 && value < min_element {
             min_element = value;
         }
@@ -242,13 +241,9 @@ fn in_dash(
     align_end: f32,
     align_total: f32,
 ) -> bool {
-    let elements = array<f32, 8>(
-        pat0.x, pat0.y, pat0.z, pat0.w,
-        pat1.x, pat1.y, pat1.z, pat1.w,
-    );
     var count = 0u;
     for (var i = 0u; i < 8u; i++) {
-        if elements[i] != 0.0 {
+        if elem8(pat0, pat1, i) != 0.0 {
             count = i + 1u;
         }
     }
@@ -259,8 +254,8 @@ fn in_dash(
         }
         var first_dash = 0.0;
         for (var i = 0u; i < count; i++) {
-            if elements[i] > 0.0 {
-                first_dash = elements[i];
+            if elem8(pat0, pat1, i) > 0.0 {
+                first_dash = elem8(pat0, pat1, i);
                 break;
             }
         }
@@ -272,7 +267,7 @@ fn in_dash(
     var position = 0.0;
     let dot_half = u.world_per_pixel * 0.75;
     for (var i = 0u; i < count; i++) {
-        let element = elements[i];
+        let element = elem8(pat0, pat1, i);
         if element == 0.0 {
             let delta = abs(value - position);
             if min(delta, pattern_length - delta) <= dot_half {

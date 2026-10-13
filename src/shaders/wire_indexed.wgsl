@@ -74,6 +74,15 @@ struct VertexOut {
     @location(9) @interpolate(flat) cap_ends:       vec3<f32>,
 }
 
+// ConstruÁgil: sem listas locais `array<f32, 8>`. O compilador GLSL ES das GPUs ARM Mali
+// (WebGL) recusa-as no estágio de fragmento: «S0032: no default precision defined for
+// variable 'float[8]'». Os 8 valores ficam em dois vec4 e são lidos por índice, sem array.
+fn elem8(p0: vec4<f32>, p1: vec4<f32>, i: u32) -> f32 {
+    let v = select(p0, p1, i >= 4u);
+    let j = i & 3u;
+    return select(select(v.x, v.y, j == 1u), select(v.z, v.w, j == 3u), j >= 2u);
+}
+
 // Half-width of one segment end: a tapered band's own end width wins, then a
 // constant world-unit band, then the screen-pixel lineweight (LWDISPLAY off
 // collapses to a hairline).
@@ -215,14 +224,8 @@ fn marker_relative(position_high: vec3<f32>, position_low: vec3<f32>, c: WireCon
 
     let lt_scale = u.linetype_scale;
     var min_elem: f32 = c.pattern_length * lt_scale;
-    let elems = array<f32, 8>(
-        c.pat0.x * lt_scale, c.pat0.y * lt_scale,
-        c.pat0.z * lt_scale, c.pat0.w * lt_scale,
-        c.pat1.x * lt_scale, c.pat1.y * lt_scale,
-        c.pat1.z * lt_scale, c.pat1.w * lt_scale,
-    );
     for (var i = 0u; i < 8u; i++) {
-        let e = abs(elems[i]);
+        let e = abs(elem8(c.pat0, c.pat1, i) * lt_scale);
         if e > 0.0 && e < min_elem { min_elem = e; }
     }
 
@@ -242,10 +245,9 @@ fn marker_relative(position_high: vec3<f32>, position_low: vec3<f32>, c: WireCon
 }
 
 fn in_dash(dist: f32, pat_len: f32, p0: vec4<f32>, p1: vec4<f32>, align_end: f32, align_total: f32) -> bool {
-    let elems = array<f32, 8>(p0.x, p0.y, p0.z, p0.w, p1.x, p1.y, p1.z, p1.w);
     var count = 0u;
     for (var i = 0u; i < 8u; i++) {
-        if elems[i] != 0.0 { count = i + 1u; }
+        if elem8(p0, p1, i) != 0.0 { count = i + 1u; }
     }
 
     var d: f32;
@@ -259,7 +261,7 @@ fn in_dash(dist: f32, pat_len: f32, p0: vec4<f32>, p1: vec4<f32>, align_end: f32
         }
         var first_dash = 0.0;
         for (var i = 0u; i < count; i++) {
-            if elems[i] > 0.0 { first_dash = elems[i]; break; }
+            if elem8(p0, p1, i) > 0.0 { first_dash = elem8(p0, p1, i); break; }
         }
         d = ((dist - align_end + first_dash) % pat_len + pat_len) % pat_len;
     } else {
@@ -269,7 +271,7 @@ fn in_dash(dist: f32, pat_len: f32, p0: vec4<f32>, p1: vec4<f32>, align_end: f32
     var pos = 0.0f;
     let dot_half = u.world_per_pixel * 0.75;
     for (var i = 0u; i < count; i++) {
-        let elem = elems[i];
+        let elem = elem8(p0, p1, i);
         if elem == 0.0 {
             let dd = abs(d - pos);
             if min(dd, pat_len - dd) <= dot_half { return true; }

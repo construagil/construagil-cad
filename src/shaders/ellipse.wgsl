@@ -50,6 +50,15 @@ struct VertexOut {
     @location(9) @interpolate(flat) end_param:   f32,
 }
 
+// ConstruÁgil: sem listas locais `array<f32, 8>`. O compilador GLSL ES das GPUs ARM Mali
+// (WebGL) recusa-as no estágio de fragmento: «S0032: no default precision defined for
+// variable 'float[8]'». Os 8 valores ficam em dois vec4 e são lidos por índice, sem array.
+fn elem8(p0: vec4<f32>, p1: vec4<f32>, i: u32) -> f32 {
+    let v = select(p0, p1, i >= 4u);
+    let j = i & 3u;
+    return select(select(v.x, v.y, j == 1u), select(v.z, v.w, j == 3u), j >= 2u);
+}
+
 fn resolve_hw(px_hw: f32) -> f32 {
     var display_hw = max(px_hw * u.lineweight_scale, 0.5);
     if u.lineweight_scale < 0.0 {
@@ -111,10 +120,9 @@ fn resolve_hw(px_hw: f32) -> f32 {
     out.start_param = in.major_axis.w;
     out.end_param = in.normal.w;
 
-    let elems = array<f32, 8>(in.pat0.x, in.pat0.y, in.pat0.z, in.pat0.w, in.pat1.x, in.pat1.y, in.pat1.z, in.pat1.w);
     var min_elem = 1e9;
     for (var i = 0u; i < 8u; i++) {
-        let e = abs(elems[i]);
+        let e = abs(elem8(in.pat0, in.pat1, i));
         if e > 0.0 && e < min_elem {
             min_elem = e;
         }
@@ -181,10 +189,9 @@ fn closest_point_ellipse(p_in: vec2<f32>, ab: vec2<f32>) -> ClosestResult {
 }
 
 fn in_dash(dist: f32, pat_len: f32, p0: vec4<f32>, p1: vec4<f32>) -> bool {
-    let elems = array<f32, 8>(p0.x, p0.y, p0.z, p0.w, p1.x, p1.y, p1.z, p1.w);
     var count = 0u;
     for (var i = 0u; i < 8u; i++) {
-        if elems[i] != 0.0 { count = i + 1u; }
+        if elem8(p0, p1, i) != 0.0 { count = i + 1u; }
     }
     if count == 0u {
         return true;
@@ -194,7 +201,7 @@ fn in_dash(dist: f32, pat_len: f32, p0: vec4<f32>, p1: vec4<f32>) -> bool {
     var pos = 0.0f;
     let dot_half = u.world_per_pixel * 0.75;
     for (var i = 0u; i < count; i++) {
-        let elem = elems[i];
+        let elem = elem8(p0, p1, i);
         if elem == 0.0 {
             let dd = abs(d - pos);
             if min(dd, pat_len - dd) <= dot_half { return true; }

@@ -148,6 +148,15 @@ struct EdgeVertexOut {
     @location(0) color: vec4<f32>,
 };
 
+// ConstruÁgil: sem listas locais `array<f32, 8>`. O compilador GLSL ES das GPUs ARM Mali
+// (WebGL) recusa-as no estágio de fragmento: «S0032: no default precision defined for
+// variable 'float[8]'». Os 8 valores ficam em dois vec4 e são lidos por índice, sem array.
+fn elem8(p0: vec4<f32>, p1: vec4<f32>, i: u32) -> f32 {
+    let v = select(p0, p1, i >= 4u);
+    let j = i & 3u;
+    return select(select(v.x, v.y, j == 1u), select(v.z, v.w, j == 3u), j >= 2u);
+}
+
 fn relative_position(
     position: vec3<f32>,
     position_low: vec3<f32>,
@@ -302,11 +311,7 @@ fn photometric_web(index: u32, cosine: f32) -> f32 {
     let angle_index = clamp(acos(clamp(cosine, -1.0, 1.0)) / 3.14159265359 * 7.0, 0.0, 7.0);
     let lower = u32(floor(angle_index));
     let upper = min(lower + 1u, 7u);
-    let value_at = array<f32, 8>(
-        profile_a.x, profile_a.y, profile_a.z, profile_a.w,
-        profile_b.x, profile_b.y, profile_b.z, profile_b.w,
-    );
-    return mix(value_at[lower], value_at[upper], fract(angle_index));
+    return mix(elem8(profile_a, profile_b, lower), elem8(profile_a, profile_b, upper), fract(angle_index));
 }
 
 @fragment
